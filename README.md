@@ -1,45 +1,45 @@
 # find-my-ev
 
-`find-my-ev` is a frontend EV discovery and comparison app built with Next.js.
+`find-my-ev` 是一个基于 Next.js 的纯前端电动车查询与对比项目。
 
-## What It Does
+## 功能说明
 
-- Browse EV models in a card list
-- Search with fuzzy matching (`Fuse.js`)
-- Filter by brand, max price, and minimum range
-- Sort by price, range, and charging speed
-- Compare up to 4 vehicles side by side
-- Persist compare selections in `localStorage`
+- 车型卡片列表浏览
+- 支持模糊搜索（`Fuse.js`）
+- 支持品牌、最高价格、最低续航筛选
+- 支持按价格、续航、快充时间排序
+- 最多可同时对比 4 台车型
+- 对比列表持久化到 `localStorage`
 
-## Tech Stack
+## 技术栈
 
-- Next.js (App Router)
+- Next.js（App Router）
 - React + TypeScript
 - Tailwind CSS
 - Zustand
 - Fuse.js
 
-## Getting Started
+## 本地运行
 
 ```bash
 npm install
 npm run dev
 ```
 
-Open: `http://localhost:3000`
+浏览器访问：`http://localhost:3000`
 
-## Project Structure
+## 目录结构
 
 ```text
 src/
-  app/            # routes and pages
-  components/     # UI components
-  data/           # static EV data
-  lib/            # i18n + stores
-  types/          # shared types
+  app/            # 路由与页面
+  components/     # 组件
+  data/           # 本地静态车型数据
+  lib/            # i18n 与状态管理
+  types/          # 类型定义
 ```
 
-## Notes
+## 说明
 
-- Vehicle data is currently static (`src/data/cars.ts`).
-- The project is frontend-only for now.
+- 车型数据目前来自本地静态文件：`src/data/cars.ts`
+- 当前项目为前端项目，未接入后端服务
