@@ -1,0 +1,210 @@
+"use client";
+
+import Fuse from "fuse.js";
+import { useMemo, useState, type CSSProperties } from "react";
+import { useRouter } from "next/navigation";
+import { cars, brandOptions } from "@/data/cars";
+import { brandLabel, t } from "@/lib/i18n";
+import { useCompareStore } from "@/lib/useCompareStore";
+import { useLanguageStore } from "@/lib/useLanguageStore";
+
+type SortType = "price-asc" | "range-desc" | "charge-asc";
+const MAX_PRICE = Math.ceil(Math.max(...cars.map((car) => car.priceCny)) / 5000) * 5000;
+
+export function CarList() {
+  const router = useRouter();
+  const [keyword, setKeyword] = useState("");
+  const [selectedBrands, setSelectedBrands] = useState<string[]>([]);
+  const [maxPrice, setMaxPrice] = useState(MAX_PRICE);
+  const [minRange, setMinRange] = useState(0);
+  const [sort, setSort] = useState<SortType>("price-asc");
+
+  const language = useLanguageStore((s) => s.language);
+  const text = t(language);
+  const ids = useCompareStore((s) => s.ids);
+  const toggleId = useCompareStore((s) => s.toggleId);
+  const pricePercent = (maxPrice / MAX_PRICE) * 100;
+  const rangePercent = (minRange / 900) * 100;
+
+  const fuse = useMemo(
+    () =>
+      new Fuse(cars, {
+        keys: ["brand", "brandZh", "model", "searchAliases", "highlights"],
+        threshold: 0.3
+      }),
+    []
+  );
+
+  const filteredCars = useMemo(() => {
+    const keywordCars = keyword.trim()
+      ? fuse.search(keyword.trim()).map((result) => result.item)
+      : cars;
+
+    return keywordCars
+      .filter((car) => car.priceCny <= maxPrice)
+      .filter((car) => car.rangeKm >= minRange)
+      .filter((car) => (selectedBrands.length ? selectedBrands.includes(car.brand) : true))
+      .sort((a, b) => {
+        if (sort === "range-desc") return b.rangeKm - a.rangeKm;
+        if (sort === "charge-asc") return a.fastChargeMin - b.fastChargeMin;
+        return a.priceCny - b.priceCny;
+      });
+  }, [fuse, keyword, maxPrice, minRange, selectedBrands, sort]);
+
+  return (
+    <div className="space-y-5">
+      <section className="panel p-4 md:p-5">
+        <h1 className="text-2xl font-bold tracking-tight">{text.title}</h1>
+        <p className="mt-2 text-sm text-slate-600">{text.subtitle}</p>
+      </section>
+
+      <section className="panel p-4 md:p-5">
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+          <label className="space-y-2 text-sm">
+            <span className="font-medium">{text.keyword}</span>
+            <input
+              value={keyword}
+              onChange={(e) => setKeyword(e.target.value)}
+              placeholder={text.keywordPlaceholder}
+              className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 outline-none ring-mint/30 focus:ring"
+            />
+          </label>
+
+          <label className="space-y-2 text-sm">
+            <span className="font-medium">
+              {text.maxPrice}：{maxPrice.toLocaleString()} {language === "zh" ? "元" : "CNY"}
+            </span>
+            <input
+              type="range"
+              min={0}
+              max={MAX_PRICE}
+              step={5000}
+              value={maxPrice}
+              onChange={(e) => setMaxPrice(Number(e.target.value))}
+              className="single-range w-full"
+              style={{ "--range-progress": `${pricePercent}%` } as CSSProperties}
+            />
+          </label>
+
+          <label className="space-y-2 text-sm">
+            <span className="font-medium">
+              {text.minRange}：{minRange} km
+            </span>
+            <input
+              type="range"
+              min={0}
+              max={900}
+              step={50}
+              value={minRange}
+              onChange={(e) => setMinRange(Number(e.target.value))}
+              className="single-range w-full"
+              style={{ "--range-progress": `${rangePercent}%` } as CSSProperties}
+            />
+          </label>
+
+          <label className="space-y-2 text-sm">
+            <span className="font-medium">{text.sort}</span>
+            <select
+              value={sort}
+              onChange={(e) => setSort(e.target.value as SortType)}
+              className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 outline-none ring-mint/30 focus:ring"
+            >
+              <option value="price-asc">{text.sortPrice}</option>
+              <option value="range-desc">{text.sortRange}</option>
+              <option value="charge-asc">{text.sortCharge}</option>
+            </select>
+          </label>
+        </div>
+
+        <div className="mt-4 flex flex-wrap gap-2">
+          {brandOptions.map((brand) => {
+            const active = selectedBrands.includes(brand);
+            const car = cars.find((item) => item.brand === brand);
+            return (
+              <button
+                key={brand}
+                type="button"
+                onClick={() =>
+                  setSelectedBrands((prev) =>
+                    prev.includes(brand) ? prev.filter((item) => item !== brand) : [...prev, brand]
+                  )
+                }
+                className={`rounded-full border px-3 py-1 text-sm transition ${
+                  active
+                    ? "border-mint bg-mint/10 text-emerald-700"
+                    : "border-slate-300 bg-white hover:border-slate-400"
+                }`}
+              >
+                {car ? brandLabel(car.brand, car.brandZh, language) : brand}
+              </button>
+            );
+          })}
+        </div>
+      </section>
+
+      <section className="panel p-4 md:p-5">
+        <div className="mb-4 flex items-center justify-between text-sm text-slate-600">
+          <span>
+            {text.results}：{filteredCars.length} {language === "zh" ? "台" : "cars"}
+          </span>
+        </div>
+
+        <div className="grid gap-4 md:grid-cols-2">
+          {filteredCars.map((car) => {
+            const active = ids.includes(car.id);
+            return (
+              <article
+                key={car.id}
+                className="cursor-pointer overflow-hidden rounded-xl border border-slate-200 bg-white transition hover:border-slate-300"
+                onClick={() => router.push(`/cars/${car.id}`)}
+              >
+                <img src={car.image} alt={car.model} className="h-44 w-full object-cover" />
+                <div className="space-y-3 p-4">
+                  <div className="flex items-start justify-between gap-4">
+                    <div>
+                      <p className="text-xs uppercase text-slate-500">{brandLabel(car.brand, car.brandZh, language)}</p>
+                      <h2 className="text-lg font-semibold">{car.model}</h2>
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-3 gap-2 text-xs text-slate-600">
+                    <div>
+                      <p>{text.range}</p>
+                      <p className="font-semibold text-ink">{car.rangeKm} km</p>
+                    </div>
+                    <div>
+                      <p>{text.charge}</p>
+                      <p className="font-semibold text-ink">{car.fastChargeMin} min</p>
+                    </div>
+                    <div>
+                      <p>{text.zeroToHundred}</p>
+                      <p className="font-semibold text-ink">{car.zeroToHundredSec}s</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center justify-between rounded-lg border border-slate-200 bg-slate-50 p-2">
+                    <p className="text-right text-sm font-semibold text-emerald-700">
+                      {car.priceCny.toLocaleString()} {language === "zh" ? "元" : "CNY"}
+                    </p>
+                    <button
+                      type="button"
+                      onClick={(event) => {
+                        event.stopPropagation();
+                        toggleId(car.id);
+                      }}
+                      className={`rounded-lg border px-3 py-2 text-sm font-medium transition ${
+                        active
+                          ? "border-emerald-300 bg-emerald-100 text-emerald-700"
+                          : "border-slate-300 bg-white text-slate-700 hover:border-slate-400"
+                      }`}
+                    >
+                      {active ? text.added : text.addCompare}
+                    </button>
+                  </div>
+                </div>
+              </article>
+            );
+          })}
+        </div>
+      </section>
+    </div>
+  );
+}
