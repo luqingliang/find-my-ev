@@ -36,6 +36,12 @@ export const messages = {
     parameters: "参数",
     price: "价格",
     battery: "电池",
+    dimensions: "长x宽x高(mm)",
+    wheelbase: "轴距(mm)",
+    batteryType: "电池类型",
+    chargeRate: "充电倍率",
+    voltagePlatform: "电压平台",
+    curbWeight: "整备质量",
     maxPower: "最大功率",
     coreSpecs: "核心参数",
     driveType: "驱动形式",
@@ -78,6 +84,12 @@ export const messages = {
     parameters: "Parameters",
     price: "Price",
     battery: "Battery",
+    dimensions: "L x W x H (mm)",
+    wheelbase: "Wheelbase (mm)",
+    batteryType: "Battery Type",
+    chargeRate: "Charge Rate",
+    voltagePlatform: "Voltage Platform",
+    curbWeight: "Curb Weight",
     maxPower: "Max Power",
     coreSpecs: "Core Specs",
     driveType: "Drive Type",
@@ -93,4 +105,22 @@ export function t(language: Language) {
 
 export function brandLabel(brand: string, brandZh: string, language: Language) {
   return language === "zh" ? brandZh : brand;
+}
+
+export function driveTypeLabel(driveType: "FWD" | "RWD" | "AWD", language: Language) {
+  if (language === "en") return driveType;
+  if (driveType === "FWD") return "前驱";
+  if (driveType === "RWD") return "后驱";
+  return "四驱";
+}
+
+export function batteryTypeLabel(batteryType: string, language: Language) {
+  if (language === "en") {
+    if (batteryType === "LFP") return "LFP";
+    if (batteryType === "NCM") return "NCM";
+    return batteryType;
+  }
+  if (batteryType === "LFP") return "磷酸铁锂";
+  if (batteryType === "NCM") return "三元锂";
+  return batteryType;
 }

@@ -4,7 +4,7 @@ import Link from "next/link";
 import { Fragment } from "react";
 import { useEffect, useMemo } from "react";
 import { useSearchParams } from "next/navigation";
-import { brandLabel, t } from "@/lib/i18n";
+import { batteryTypeLabel, brandLabel, driveTypeLabel, t } from "@/lib/i18n";
 import { carMap } from "@/data/cars";
 import { useCompareStore } from "@/lib/useCompareStore";
 import { useLanguageStore } from "@/lib/useLanguageStore";
@@ -63,6 +63,55 @@ export default function ComparePage() {
       render: (id: string) => {
         const car = carMap.get(id);
         return car ? `${car.batteryKWh} kWh` : "-";
+      }
+    },
+    {
+      label: text.dimensions,
+      render: (id: string) => {
+        const car = carMap.get(id);
+        return car ? car.dimensionsMm : "-";
+      }
+    },
+    {
+      label: text.wheelbase,
+      render: (id: string) => {
+        const car = carMap.get(id);
+        return car ? `${car.wheelbaseMm}` : "-";
+      }
+    },
+    {
+      label: text.batteryType,
+      render: (id: string) => {
+        const car = carMap.get(id);
+        return car ? batteryTypeLabel(car.batteryType, language) : "-";
+      }
+    },
+    {
+      label: text.chargeRate,
+      render: (id: string) => {
+        const car = carMap.get(id);
+        return car ? car.chargeRate : "-";
+      }
+    },
+    {
+      label: text.voltagePlatform,
+      render: (id: string) => {
+        const car = carMap.get(id);
+        return car ? car.voltagePlatform : "-";
+      }
+    },
+    {
+      label: text.curbWeight,
+      render: (id: string) => {
+        const car = carMap.get(id);
+        return car ? `${car.curbWeightKg} kg` : "-";
+      }
+    },
+    {
+      label: text.driveType,
+      render: (id: string) => {
+        const car = carMap.get(id);
+        return car ? driveTypeLabel(car.driveType, language) : "-";
       }
     },
     {
@@ -146,7 +195,7 @@ export default function ComparePage() {
 
             {specRows.map((row) => (
               <Fragment key={row.label}>
-                <div className="flex items-center border-t border-slate-200 py-4 text-sm font-semibold text-slate-600">
+                <div className="flex items-center border-t border-slate-200 py-4 text-sm font-medium text-slate-500">
                   {row.label}
                 </div>
                 {cars.map((car) => (

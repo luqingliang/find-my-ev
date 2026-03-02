@@ -11,6 +11,12 @@ export type Car = {
   zeroToHundredSec: number;
   maxSpeedKmh: number;
   fastChargeMin: number;
+  dimensionsMm: string;
+  wheelbaseMm: number;
+  batteryType: string;
+  chargeRate: string;
+  voltagePlatform: string;
+  curbWeightKg: number;
   driveType: "FWD" | "RWD" | "AWD";
   seats: number;
   image: string;

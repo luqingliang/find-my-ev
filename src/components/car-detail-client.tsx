@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { brandLabel, t } from "@/lib/i18n";
+import { batteryTypeLabel, brandLabel, driveTypeLabel, t } from "@/lib/i18n";
 import { useLanguageStore } from "@/lib/useLanguageStore";
 import { Car } from "@/types/car";
 
@@ -33,11 +33,17 @@ export function CarDetailClient({ car }: { car: Car }) {
         <h2 className="text-xl font-semibold">{text.coreSpecs}</h2>
         <div className="mt-4 grid gap-3 sm:grid-cols-2 md:grid-cols-3">
           <Metric label={text.range} value={`${car.rangeKm} km`} />
+          <Metric label={text.dimensions} value={car.dimensionsMm} />
+          <Metric label={text.wheelbase} value={`${car.wheelbaseMm}`} />
           <Metric label={text.battery} value={`${car.batteryKWh} kWh`} />
+          <Metric label={text.batteryType} value={batteryTypeLabel(car.batteryType, language)} />
+          <Metric label={text.chargeRate} value={car.chargeRate} />
+          <Metric label={text.voltagePlatform} value={car.voltagePlatform} />
+          <Metric label={text.curbWeight} value={`${car.curbWeightKg} kg`} />
           <Metric label={text.maxPower} value={`${car.maxPowerKw} kW`} />
           <Metric label={text.zeroToHundred} value={`${car.zeroToHundredSec} s`} />
           <Metric label={text.charge} value={`${car.fastChargeMin} min`} />
-          <Metric label={text.driveType} value={car.driveType} />
+          <Metric label={text.driveType} value={driveTypeLabel(car.driveType, language)} />
           <Metric label={text.seats} value={`${car.seats}`} />
           <Metric label={text.topSpeed} value={`${car.maxSpeedKmh} km/h`} />
         </div>
