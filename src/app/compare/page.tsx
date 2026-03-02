@@ -43,97 +43,145 @@ export default function ComparePage() {
     );
   }
 
-  const specRows = [
+  const specCategories = [
     {
-      label: text.price,
-      render: (id: string) => {
-        const car = carMap.get(id);
-        return car ? `${car.priceCny.toLocaleString()} ${language === "zh" ? "元" : "CNY"}` : "-";
-      }
+      title: text.categoryDimensions,
+      rows: [
+        {
+          label: text.dimensions,
+          render: (id: string) => {
+            const car = carMap.get(id);
+            return car ? car.dimensionsMm : "-";
+          }
+        },
+        {
+          label: text.wheelbase,
+          render: (id: string) => {
+            const car = carMap.get(id);
+            return car ? `${car.wheelbaseMm}` : "-";
+          }
+        },
+        {
+          label: text.curbWeight,
+          render: (id: string) => {
+            const car = carMap.get(id);
+            return car ? `${car.curbWeightKg} kg` : "-";
+          }
+        }
+      ]
     },
     {
-      label: text.range,
-      render: (id: string) => {
-        const car = carMap.get(id);
-        return car ? `${car.rangeKm} km` : "-";
-      }
+      title: text.categoryBatteryRange,
+      rows: [
+        {
+          label: text.range,
+          render: (id: string) => {
+            const car = carMap.get(id);
+            return car ? `${car.rangeKm} km` : "-";
+          }
+        },
+        {
+          label: text.battery,
+          render: (id: string) => {
+            const car = carMap.get(id);
+            return car ? `${car.batteryKWh} kWh` : "-";
+          }
+        },
+        {
+          label: text.batteryType,
+          render: (id: string) => {
+            const car = carMap.get(id);
+            return car ? batteryTypeLabel(car.batteryType, language) : "-";
+          }
+        },
+        {
+          label: text.chargeRate,
+          render: (id: string) => {
+            const car = carMap.get(id);
+            return car ? car.chargeRate : "-";
+          }
+        },
+        {
+          label: text.voltagePlatform,
+          render: (id: string) => {
+            const car = carMap.get(id);
+            return car ? car.voltagePlatform : "-";
+          }
+        },
+        {
+          label: text.charge,
+          render: (id: string) => {
+            const car = carMap.get(id);
+            return car ? `${car.fastChargeMin} min` : "-";
+          }
+        }
+      ]
     },
     {
-      label: text.battery,
-      render: (id: string) => {
-        const car = carMap.get(id);
-        return car ? `${car.batteryKWh} kWh` : "-";
-      }
+      title: text.categorySmart,
+      rows: [
+        {
+          label: text.cockpitChip,
+          render: (id: string) => {
+            const car = carMap.get(id);
+            return car ? car.cockpitChip : "-";
+          }
+        },
+        {
+          label: text.adChip,
+          render: (id: string) => {
+            const car = carMap.get(id);
+            return car ? car.adChip : "-";
+          }
+        },
+        {
+          label: text.adCompute,
+          render: (id: string) => {
+            const car = carMap.get(id);
+            return car ? `${car.adComputeTops} TOPS` : "-";
+          }
+        }
+      ]
     },
     {
-      label: text.dimensions,
-      render: (id: string) => {
-        const car = carMap.get(id);
-        return car ? car.dimensionsMm : "-";
-      }
-    },
-    {
-      label: text.wheelbase,
-      render: (id: string) => {
-        const car = carMap.get(id);
-        return car ? `${car.wheelbaseMm}` : "-";
-      }
-    },
-    {
-      label: text.batteryType,
-      render: (id: string) => {
-        const car = carMap.get(id);
-        return car ? batteryTypeLabel(car.batteryType, language) : "-";
-      }
-    },
-    {
-      label: text.chargeRate,
-      render: (id: string) => {
-        const car = carMap.get(id);
-        return car ? car.chargeRate : "-";
-      }
-    },
-    {
-      label: text.voltagePlatform,
-      render: (id: string) => {
-        const car = carMap.get(id);
-        return car ? car.voltagePlatform : "-";
-      }
-    },
-    {
-      label: text.curbWeight,
-      render: (id: string) => {
-        const car = carMap.get(id);
-        return car ? `${car.curbWeightKg} kg` : "-";
-      }
-    },
-    {
-      label: text.driveType,
-      render: (id: string) => {
-        const car = carMap.get(id);
-        return car ? driveTypeLabel(car.driveType, language) : "-";
-      }
-    },
-    {
-      label: text.maxPower,
-      render: (id: string) => {
-        const car = carMap.get(id);
-        return car ? `${car.maxPowerKw} kW` : "-";
-      }
-    },
-    {
-      label: text.zeroToHundred,
-      render: (id: string) => {
-        const car = carMap.get(id);
-        return car ? `${car.zeroToHundredSec} s` : "-";
-      }
-    },
-    {
-      label: text.charge,
-      render: (id: string) => {
-        const car = carMap.get(id);
-        return car ? `${car.fastChargeMin} min` : "-";
-      }
+      title: text.categoryPerformance,
+      rows: [
+        {
+          label: text.driveType,
+          render: (id: string) => {
+            const car = carMap.get(id);
+            return car ? driveTypeLabel(car.driveType, language) : "-";
+          }
+        },
+        {
+          label: text.maxPower,
+          render: (id: string) => {
+            const car = carMap.get(id);
+            return car ? `${car.maxPowerKw} kW` : "-";
+          }
+        },
+        {
+          label: text.zeroToHundred,
+          render: (id: string) => {
+            const car = carMap.get(id);
+            return car ? `${car.zeroToHundredSec} s` : "-";
+          }
+        },
+        {
+          label: text.topSpeed,
+          render: (id: string) => {
+            const car = carMap.get(id);
+            return car ? `${car.maxSpeedKmh} km/h` : "-";
+          }
+        },
+        {
+          label: text.price,
+          render: (id: string) => {
+            const car = carMap.get(id);
+            return car ? `${car.priceCny.toLocaleString()} ${language === "zh" ? "元" : "CNY"}` : "-";
+          }
+        }
+      ]
     }
   ];
 
@@ -193,18 +241,29 @@ export default function ComparePage() {
               </article>
             ))}
 
-            {specRows.map((row) => (
-              <Fragment key={row.label}>
-                <div className="flex items-center border-t border-slate-200 py-4 text-sm font-medium text-slate-500">
-                  {row.label}
+            {specCategories.map((category) => (
+              <Fragment key={category.title}>
+                <div
+                  className="mt-2 rounded-lg bg-slate-100 pl-0 pr-3 py-2 text-left text-xl font-bold uppercase tracking-wide text-slate-700 md:text-2xl"
+                  style={{ gridColumn: "1 / -1" }}
+                >
+                  {category.title}
                 </div>
-                {cars.map((car) => (
-                  <div
-                    key={`${row.label}-${car.id}`}
-                    className="flex items-center justify-center border-t border-slate-200 py-4 text-center text-base font-semibold text-ink"
-                  >
-                    {row.render(car.id)}
-                  </div>
+                <div className="border-b border-slate-300" style={{ gridColumn: "1 / -1" }} />
+                {category.rows.map((row) => (
+                  <Fragment key={`${category.title}-${row.label}`}>
+                    <div className="flex items-center py-4 text-sm font-normal text-gray-500">
+                      {row.label}
+                    </div>
+                    {cars.map((car) => (
+                      <div
+                        key={`${row.label}-${car.id}`}
+                        className="flex items-center justify-center py-4 text-center text-base font-semibold text-ink"
+                      >
+                        {row.render(car.id)}
+                      </div>
+                    ))}
+                  </Fragment>
                 ))}
               </Fragment>
             ))}

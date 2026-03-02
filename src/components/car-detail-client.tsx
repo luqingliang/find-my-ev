@@ -8,6 +8,45 @@ import { Car } from "@/types/car";
 export function CarDetailClient({ car }: { car: Car }) {
   const language = useLanguageStore((s) => s.language);
   const text = t(language);
+  const categories = [
+    {
+      title: text.categoryDimensions,
+      items: [
+        { label: text.dimensions, value: car.dimensionsMm },
+        { label: text.wheelbase, value: `${car.wheelbaseMm}` },
+        { label: text.curbWeight, value: `${car.curbWeightKg} kg` },
+        { label: text.seats, value: `${car.seats}` }
+      ]
+    },
+    {
+      title: text.categoryBatteryRange,
+      items: [
+        { label: text.range, value: `${car.rangeKm} km` },
+        { label: text.battery, value: `${car.batteryKWh} kWh` },
+        { label: text.batteryType, value: batteryTypeLabel(car.batteryType, language) },
+        { label: text.chargeRate, value: car.chargeRate },
+        { label: text.voltagePlatform, value: car.voltagePlatform },
+        { label: text.charge, value: `${car.fastChargeMin} min` }
+      ]
+    },
+    {
+      title: text.categorySmart,
+      items: [
+        { label: text.cockpitChip, value: car.cockpitChip },
+        { label: text.adChip, value: car.adChip },
+        { label: text.adCompute, value: `${car.adComputeTops} TOPS` }
+      ]
+    },
+    {
+      title: text.categoryPerformance,
+      items: [
+        { label: text.maxPower, value: `${car.maxPowerKw} kW` },
+        { label: text.zeroToHundred, value: `${car.zeroToHundredSec} s` },
+        { label: text.topSpeed, value: `${car.maxSpeedKmh} km/h` },
+        { label: text.driveType, value: driveTypeLabel(car.driveType, language) }
+      ]
+    }
+  ];
 
   return (
     <div className="space-y-5">
@@ -31,21 +70,17 @@ export function CarDetailClient({ car }: { car: Car }) {
 
       <section className="panel p-5 md:p-6">
         <h2 className="text-xl font-semibold">{text.coreSpecs}</h2>
-        <div className="mt-4 grid gap-3 sm:grid-cols-2 md:grid-cols-3">
-          <Metric label={text.range} value={`${car.rangeKm} km`} />
-          <Metric label={text.dimensions} value={car.dimensionsMm} />
-          <Metric label={text.wheelbase} value={`${car.wheelbaseMm}`} />
-          <Metric label={text.battery} value={`${car.batteryKWh} kWh`} />
-          <Metric label={text.batteryType} value={batteryTypeLabel(car.batteryType, language)} />
-          <Metric label={text.chargeRate} value={car.chargeRate} />
-          <Metric label={text.voltagePlatform} value={car.voltagePlatform} />
-          <Metric label={text.curbWeight} value={`${car.curbWeightKg} kg`} />
-          <Metric label={text.maxPower} value={`${car.maxPowerKw} kW`} />
-          <Metric label={text.zeroToHundred} value={`${car.zeroToHundredSec} s`} />
-          <Metric label={text.charge} value={`${car.fastChargeMin} min`} />
-          <Metric label={text.driveType} value={driveTypeLabel(car.driveType, language)} />
-          <Metric label={text.seats} value={`${car.seats}`} />
-          <Metric label={text.topSpeed} value={`${car.maxSpeedKmh} km/h`} />
+        <div className="mt-4 space-y-4">
+          {categories.map((category) => (
+            <section key={category.title} className="rounded-2xl border border-slate-200 p-4">
+              <h3 className="text-sm font-semibold uppercase tracking-wide text-slate-500">{category.title}</h3>
+              <div className="mt-3 grid gap-3 sm:grid-cols-2 md:grid-cols-3">
+                {category.items.map((item) => (
+                  <Metric key={`${category.title}-${item.label}`} label={item.label} value={item.value} />
+                ))}
+              </div>
+            </section>
+          ))}
         </div>
       </section>
 

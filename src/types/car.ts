@@ -8,6 +8,9 @@ export type Car = {
   rangeKm: number;
   batteryKWh: number;
   maxPowerKw: number;
+  cockpitChip: string;
+  adChip: string;
+  adComputeTops: number;
   zeroToHundredSec: number;
   maxSpeedKmh: number;
   fastChargeMin: number;

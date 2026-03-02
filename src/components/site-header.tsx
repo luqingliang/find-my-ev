@@ -2,13 +2,11 @@
 
 import Link from "next/link";
 import { t } from "@/lib/i18n";
-import { useCompareStore } from "@/lib/useCompareStore";
 import { useLanguageStore } from "@/lib/useLanguageStore";
 
 export function SiteHeader() {
   const language = useLanguageStore((s) => s.language);
   const setLanguage = useLanguageStore((s) => s.setLanguage);
-  const ids = useCompareStore((s) => s.ids);
   const text = t(language);
 
   return (
@@ -38,12 +36,6 @@ export function SiteHeader() {
               EN
             </button>
           </div>
-          <Link
-            href="/compare"
-            className="rounded-lg bg-ink px-3 py-2 text-sm font-medium text-white transition hover:bg-black"
-          >
-            {text.navCompare}（{ids.length}/4）
-          </Link>
         </div>
       </div>
     </header>

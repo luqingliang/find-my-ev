@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { LanguageSync } from "@/components/language-sync";
 import { SiteHeader } from "@/components/site-header";
+import { CompareFab } from "@/components/compare-fab";
 
 export const metadata: Metadata = {
   title: "找到我的车",
@@ -14,6 +15,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body>
         <LanguageSync />
         <SiteHeader />
+        <CompareFab />
         <main className="mx-auto max-w-6xl px-4 py-6">{children}</main>
       </body>
     </html>
