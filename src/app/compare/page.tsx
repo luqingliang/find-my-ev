@@ -4,10 +4,11 @@ import Link from "next/link";
 import { Fragment } from "react";
 import { useEffect, useMemo } from "react";
 import { useSearchParams } from "next/navigation";
-import { batteryTypeLabel, brandLabel, driveTypeLabel, t } from "@/lib/i18n";
+import { brandLabel, t } from "@/lib/i18n";
 import { carMap } from "@/data/cars";
 import { useCompareStore } from "@/lib/useCompareStore";
 import { useLanguageStore } from "@/lib/useLanguageStore";
+import type { Car } from "@/types/car";
 
 const MAX_COMPARE_COUNT = 4;
 
@@ -26,7 +27,37 @@ export default function ComparePage() {
     }
   }, [searchParams, setIds]);
 
-  const cars = useMemo(() => ids.map((id) => carMap.get(id)).filter(Boolean), [ids]);
+  const cars = useMemo(() => ids.map((id) => carMap.get(id)).filter((car): car is Car => Boolean(car)), [ids]);
+
+  const specCategories = useMemo(() => {
+    const sectionMap = new Map<string, Set<string>>();
+    const order: string[] = [];
+
+    for (const car of cars) {
+      for (const section of car.paramsBySection) {
+        if (!sectionMap.has(section.name)) {
+          sectionMap.set(section.name, new Set<string>());
+          order.push(section.name);
+        }
+        for (const item of section.items) {
+          sectionMap.get(section.name)?.add(item.name);
+        }
+      }
+    }
+
+    return order.map((sectionName) => ({
+      title: sectionName,
+      rows: [...(sectionMap.get(sectionName) ?? [])].map((label) => ({
+        label,
+        render: (id: string) => {
+          const car = carMap.get(id);
+          return car?.paramValueByName[label] || "-";
+        }
+      }))
+    }));
+  }, [cars]);
+
+  const columns = `140px repeat(${cars.length}, minmax(0, 1fr))`;
 
   if (!cars.length) {
     return (
@@ -42,150 +73,6 @@ export default function ComparePage() {
       </section>
     );
   }
-
-  const specCategories = [
-    {
-      title: text.categoryDimensions,
-      rows: [
-        {
-          label: text.dimensions,
-          render: (id: string) => {
-            const car = carMap.get(id);
-            return car ? car.dimensionsMm : "-";
-          }
-        },
-        {
-          label: text.wheelbase,
-          render: (id: string) => {
-            const car = carMap.get(id);
-            return car ? `${car.wheelbaseMm}` : "-";
-          }
-        },
-        {
-          label: text.curbWeight,
-          render: (id: string) => {
-            const car = carMap.get(id);
-            return car ? `${car.curbWeightKg} kg` : "-";
-          }
-        }
-      ]
-    },
-    {
-      title: text.categoryBatteryRange,
-      rows: [
-        {
-          label: text.range,
-          render: (id: string) => {
-            const car = carMap.get(id);
-            return car ? `${car.rangeKm} km` : "-";
-          }
-        },
-        {
-          label: text.battery,
-          render: (id: string) => {
-            const car = carMap.get(id);
-            return car ? `${car.batteryKWh} kWh` : "-";
-          }
-        },
-        {
-          label: text.batteryType,
-          render: (id: string) => {
-            const car = carMap.get(id);
-            return car ? batteryTypeLabel(car.batteryType, language) : "-";
-          }
-        },
-        {
-          label: text.chargeRate,
-          render: (id: string) => {
-            const car = carMap.get(id);
-            return car ? car.chargeRate : "-";
-          }
-        },
-        {
-          label: text.voltagePlatform,
-          render: (id: string) => {
-            const car = carMap.get(id);
-            return car ? car.voltagePlatform : "-";
-          }
-        },
-        {
-          label: text.charge,
-          render: (id: string) => {
-            const car = carMap.get(id);
-            return car ? `${car.fastChargeMin} min` : "-";
-          }
-        }
-      ]
-    },
-    {
-      title: text.categorySmart,
-      rows: [
-        {
-          label: text.cockpitChip,
-          render: (id: string) => {
-            const car = carMap.get(id);
-            return car ? car.cockpitChip : "-";
-          }
-        },
-        {
-          label: text.adChip,
-          render: (id: string) => {
-            const car = carMap.get(id);
-            return car ? car.adChip : "-";
-          }
-        },
-        {
-          label: text.adCompute,
-          render: (id: string) => {
-            const car = carMap.get(id);
-            return car ? `${car.adComputeTops} TOPS` : "-";
-          }
-        }
-      ]
-    },
-    {
-      title: text.categoryPerformance,
-      rows: [
-        {
-          label: text.driveType,
-          render: (id: string) => {
-            const car = carMap.get(id);
-            return car ? driveTypeLabel(car.driveType, language) : "-";
-          }
-        },
-        {
-          label: text.maxPower,
-          render: (id: string) => {
-            const car = carMap.get(id);
-            return car ? `${car.maxPowerKw} kW` : "-";
-          }
-        },
-        {
-          label: text.zeroToHundred,
-          render: (id: string) => {
-            const car = carMap.get(id);
-            return car ? `${car.zeroToHundredSec} s` : "-";
-          }
-        },
-        {
-          label: text.topSpeed,
-          render: (id: string) => {
-            const car = carMap.get(id);
-            return car ? `${car.maxSpeedKmh} km/h` : "-";
-          }
-        },
-        {
-          label: text.price,
-          render: (id: string) => {
-            const car = carMap.get(id);
-            return car ? `${car.priceCny.toLocaleString()} ${language === "zh" ? "元" : "CNY"}` : "-";
-          }
-        }
-      ]
-    }
-  ];
-
-  const columns = `140px repeat(${cars.length}, minmax(0, 1fr))`;
 
   return (
     <div className="space-y-6">

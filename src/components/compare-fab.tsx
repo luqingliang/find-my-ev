@@ -6,13 +6,14 @@ import { carMap } from "@/data/cars";
 import { brandLabel, t } from "@/lib/i18n";
 import { useCompareStore } from "@/lib/useCompareStore";
 import { useLanguageStore } from "@/lib/useLanguageStore";
+import type { Car } from "@/types/car";
 
 export function CompareFab() {
   const pathname = usePathname();
   const ids = useCompareStore((s) => s.ids);
   const language = useLanguageStore((s) => s.language);
   const text = t(language);
-  const compareCars = ids.map((id) => carMap.get(id)).filter(Boolean);
+  const compareCars = ids.map((id) => carMap.get(id)).filter((car): car is Car => Boolean(car));
   const compareHref = ids.length ? `/compare?ids=${ids.join(",")}` : "/compare";
 
   if (pathname === "/compare") return null;

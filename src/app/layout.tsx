@@ -4,6 +4,8 @@ import { LanguageSync } from "@/components/language-sync";
 import { SiteHeader } from "@/components/site-header";
 import { CompareFab } from "@/components/compare-fab";
 
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = {
   title: "找到我的车",
   description: "纯前端电动车查询与对比网站"

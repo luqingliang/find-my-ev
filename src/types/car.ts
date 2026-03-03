@@ -1,3 +1,14 @@
+export type CarParam = {
+  key: string;
+  name: string;
+  value: string;
+};
+
+export type CarParamSection = {
+  name: string;
+  items: CarParam[];
+};
+
 export type Car = {
   id: string;
   brand: string;
@@ -6,22 +17,10 @@ export type Car = {
   searchAliases: string[];
   priceCny: number;
   rangeKm: number;
-  batteryKWh: number;
-  maxPowerKw: number;
-  cockpitChip: string;
-  adChip: string;
-  adComputeTops: number;
   zeroToHundredSec: number;
-  maxSpeedKmh: number;
   fastChargeMin: number;
-  dimensionsMm: string;
-  wheelbaseMm: number;
-  batteryType: string;
-  chargeRate: string;
-  voltagePlatform: string;
-  curbWeightKg: number;
-  driveType: "FWD" | "RWD" | "AWD";
-  seats: number;
   image: string;
   highlights: string[];
+  paramsBySection: CarParamSection[];
+  paramValueByName: Record<string, string>;
 };
