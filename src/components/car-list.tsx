@@ -61,19 +61,19 @@ export function CarList() {
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
           <label className="space-y-2 text-sm">
             <span className="font-medium">{text.keyword}</span>
-            <input
-              value={keyword}
-              onChange={(e) => setKeyword(e.target.value)}
-              placeholder={text.keywordPlaceholder}
-              className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 outline-none ring-mint/30 focus:ring"
-            />
-          </label>
+              <input
+                value={keyword}
+                onChange={(e) => setKeyword(e.target.value)}
+                placeholder={text.keywordPlaceholder}
+                className="glass-field w-full px-3 py-2"
+              />
+            </label>
 
           <label className="space-y-2 text-sm">
             <span className="font-medium">
               {text.maxPrice}：{maxPrice.toLocaleString()} {language === "zh" ? "元" : "CNY"}
             </span>
-            <input
+              <input
               type="range"
               min={0}
               max={MAX_PRICE}
@@ -106,8 +106,8 @@ export function CarList() {
             <select
               value={sort}
               onChange={(e) => setSort(e.target.value as SortType)}
-              className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 outline-none ring-mint/30 focus:ring"
-            >
+                className="glass-field w-full px-3 py-2"
+              >
               <option value="price-asc">{text.sortPrice}</option>
               <option value="range-desc">{text.sortRange}</option>
               <option value="charge-asc">{text.sortCharge}</option>
@@ -128,10 +128,10 @@ export function CarList() {
                     prev.includes(brand) ? prev.filter((item) => item !== brand) : [...prev, brand]
                   )
                 }
-                className={`rounded-full border px-3 py-1 text-sm transition ${
+                className={`glass-chip px-3 py-1 text-sm transition ${
                   active
-                    ? "border-mint bg-mint/10 text-emerald-700"
-                    : "border-slate-300 bg-white hover:border-slate-400"
+                    ? "border-cyan-200 bg-cyan-100/70 text-cyan-900"
+                    : "text-slate-700 hover:border-white"
                 }`}
               >
                 {series ? brandLabel(series.brand, series.brandZh, language) : brand}
@@ -154,7 +154,7 @@ export function CarList() {
             return (
               <article
                 key={series.id}
-                className="cursor-pointer overflow-hidden rounded-xl border border-slate-200 bg-white transition hover:border-slate-300"
+                className="glass-panel cursor-pointer overflow-hidden transition hover:-translate-y-0.5"
                 onClick={() => router.push(`/series/${series.id}`)}
               >
                 <div className="relative h-44 w-full">
@@ -163,7 +163,7 @@ export function CarList() {
                 <div className="space-y-3 p-4">
                   <div className="flex items-start justify-between gap-4">
                     <div>
-                      <p className="text-xs uppercase text-slate-500">{brandLabel(series.brand, series.brandZh, language)}</p>
+                      <p className="text-xs uppercase tracking-wide text-slate-500">{brandLabel(series.brand, series.brandZh, language)}</p>
                       <h2 className="text-lg font-semibold">{series.name}</h2>
                       <p className="text-xs text-slate-500">
                         {series.cars.length} {text.modelsUnit}
@@ -186,7 +186,7 @@ export function CarList() {
                       </p>
                     </div>
                   </div>
-                  <div className="rounded-lg border border-slate-200 bg-slate-50 p-2">
+                  <div className="glass-soft rounded-lg p-2">
                     <p className="text-center text-sm font-semibold text-ink">{text.viewSeries}</p>
                   </div>
                 </div>

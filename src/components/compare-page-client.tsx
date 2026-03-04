@@ -59,10 +59,7 @@ export function ComparePageClient({ queryIds }: { queryIds: string[] }) {
       <section className="panel p-10 text-center">
         <h1 className="text-3xl font-semibold tracking-tight">{text.emptyCompare}</h1>
         <p className="mx-auto mt-3 max-w-xl text-slate-600">{text.emptyCompareDesc}</p>
-        <Link
-          href="/"
-          className="mt-6 inline-block rounded-full bg-ink px-6 py-3 text-sm font-semibold text-white transition hover:opacity-90"
-        >
+        <Link href="/" className="glass-btn glass-btn-primary mt-6 inline-block px-6 py-3 text-sm font-semibold">
           {text.backToList}
         </Link>
       </section>
@@ -84,14 +81,14 @@ export function ComparePageClient({ queryIds }: { queryIds: string[] }) {
             {cars.length < MAX_COMPARE_COUNT ? (
               <Link
                 href="/"
-                className="rounded-full border border-slate-300 px-4 py-2 text-sm font-medium transition hover:border-slate-400"
+                className="glass-btn px-4 py-2 text-sm font-medium"
               >
                 {text.continueAdd}
               </Link>
             ) : null}
             <button
               onClick={clear}
-              className="rounded-full border border-rose-200 bg-rose-50 px-4 py-2 text-sm font-medium text-rose-700 transition hover:bg-rose-100"
+              className="glass-btn glass-btn-danger px-4 py-2 text-sm font-medium"
             >
               {text.clearCompare}
             </button>
@@ -99,21 +96,21 @@ export function ComparePageClient({ queryIds }: { queryIds: string[] }) {
         </div>
       </section>
 
-      <section className="overflow-x-auto rounded-3xl border border-slate-200 bg-white/90 shadow-panel">
+      <section className="panel overflow-x-auto rounded-3xl">
         <div className="min-w-[760px] p-4 md:min-w-0 md:p-6">
           <div className="grid gap-x-3 gap-y-4" style={{ gridTemplateColumns: columns }}>
             <div />
             {cars.map((car) => (
-              <article key={car.id} className="relative rounded-2xl border border-slate-200 bg-slate-50/70 px-4 py-5 text-center">
+              <article key={car.id} className="glass-panel relative rounded-2xl px-4 py-5 text-center">
                 <button
                   type="button"
                   onClick={() => setIds(ids.filter((id) => id !== car.id))}
-                  className="absolute right-2 top-2 flex h-6 w-6 items-center justify-center rounded-full border border-slate-300 bg-white text-sm leading-none text-slate-500 transition hover:border-rose-300 hover:text-rose-600"
+                  className="glass-btn absolute right-2 top-2 flex h-6 w-6 items-center justify-center text-sm leading-none text-slate-500"
                   aria-label={language === "zh" ? "移除该车型" : "Remove this vehicle"}
                 >
                   ×
                 </button>
-                <div className="mx-auto flex h-24 w-full items-center justify-center overflow-hidden rounded-xl bg-white">
+                <div className="glass-soft mx-auto flex h-24 w-full items-center justify-center overflow-hidden rounded-xl">
                   <Image src={car.image} alt={car.model} width={320} height={180} unoptimized className="h-20 w-auto object-contain" />
                 </div>
                 <p className="mt-4 text-xs font-semibold uppercase tracking-wide text-slate-500">
@@ -126,12 +123,12 @@ export function ComparePageClient({ queryIds }: { queryIds: string[] }) {
             {specCategories.map((category) => (
               <Fragment key={category.title}>
                 <div
-                  className="mt-2 rounded-lg bg-slate-100 pl-0 pr-3 py-2 text-left text-xl font-bold uppercase tracking-wide text-slate-700 md:text-2xl"
+                  className="glass-table-head mt-2 pl-0 pr-3 py-2 text-left text-xl font-bold uppercase tracking-wide text-slate-700 md:text-2xl"
                   style={{ gridColumn: "1 / -1" }}
                 >
                   {category.title}
                 </div>
-                <div className="border-b border-slate-300" style={{ gridColumn: "1 / -1" }} />
+                <div className="border-b border-white/60" style={{ gridColumn: "1 / -1" }} />
                 {category.rows.map((row) => (
                   <Fragment key={`${category.title}-${row.label}`}>
                     <div className="flex items-center py-4 text-sm font-normal text-gray-500">
