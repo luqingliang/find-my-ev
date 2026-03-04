@@ -6,7 +6,7 @@ export const messages = {
     navCompare: "查看对比",
     navHome: "返回列表",
     title: "电动车查询与对比",
-    subtitle: "支持关键词搜索、品牌过滤、续航/价格筛选，并可勾选最多 4 台车型进入对比。",
+    subtitle: "按车系搜索和筛选，先查看车系，再进入车系内选择具体车型。",
     keyword: "关键词",
     keywordPlaceholder: "例如：800V / Tesla / 特斯拉 / 四驱",
     priceRange: "价格区间",
@@ -55,14 +55,18 @@ export const messages = {
     driveType: "驱动形式",
     seats: "座位数",
     topSpeed: "最高时速",
-    compareThis: "仅对比此车型"
+    compareThis: "仅对比此车型",
+    seriesUnit: "个车系",
+    modelsUnit: "款车型",
+    viewSeries: "查看车系",
+    backToSeries: "返回车系"
   },
   en: {
     siteTitle: "FindMyEV",
     navCompare: "Compare",
     navHome: "Back to List",
     title: "EV Search & Comparison",
-    subtitle: "Search, filter by brand/price/range, and compare up to 4 EVs.",
+    subtitle: "Search and filter by EV series, then choose specific trims inside each series.",
     keyword: "Keyword",
     keywordPlaceholder: "e.g. 800V / Tesla / 特斯拉 / AWD",
     priceRange: "Price Range",
@@ -111,7 +115,11 @@ export const messages = {
     driveType: "Drive Type",
     seats: "Seats",
     topSpeed: "Top Speed",
-    compareThis: "Compare This"
+    compareThis: "Compare This",
+    seriesUnit: "series",
+    modelsUnit: "trims",
+    viewSeries: "View Series",
+    backToSeries: "Back to Series"
   }
 } as const;
 

@@ -4,13 +4,13 @@ import Fuse from "fuse.js";
 import { useMemo, useState, type CSSProperties } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-import { cars, brandOptions } from "@/data/cars";
+import { brandOptions, carSeriesList } from "@/data/cars";
 import { brandLabel, t } from "@/lib/i18n";
-import { useCompareStore } from "@/lib/useCompareStore";
 import { useLanguageStore } from "@/lib/useLanguageStore";
 
 type SortType = "price-asc" | "range-desc" | "charge-asc";
-const MAX_PRICE = Math.ceil(Math.max(...cars.map((car) => car.priceCny)) / 5000) * 5000;
+const computedMaxPrice = Math.ceil(Math.max(...carSeriesList.map((series) => series.minPriceCny)) / 5000) * 5000;
+const MAX_PRICE = computedMaxPrice > 0 ? computedMaxPrice : 5000;
 
 export function CarList() {
   const router = useRouter();
@@ -22,33 +22,31 @@ export function CarList() {
 
   const language = useLanguageStore((s) => s.language);
   const text = t(language);
-  const ids = useCompareStore((s) => s.ids);
-  const toggleId = useCompareStore((s) => s.toggleId);
   const pricePercent = (maxPrice / MAX_PRICE) * 100;
   const rangePercent = (minRange / 900) * 100;
 
   const fuse = useMemo(
     () =>
-      new Fuse(cars, {
-        keys: ["brand", "brandZh", "model", "searchAliases", "highlights"],
+      new Fuse(carSeriesList, {
+        keys: ["name", "brand", "brandZh", "searchAliases"],
         threshold: 0.3
       }),
     []
   );
 
-  const filteredCars = useMemo(() => {
-    const keywordCars = keyword.trim()
+  const filteredSeries = useMemo(() => {
+    const keywordSeries = keyword.trim()
       ? fuse.search(keyword.trim()).map((result) => result.item)
-      : cars;
+      : carSeriesList;
 
-    return keywordCars
-      .filter((car) => car.priceCny <= maxPrice)
-      .filter((car) => car.rangeKm >= minRange)
-      .filter((car) => (selectedBrands.length ? selectedBrands.includes(car.brand) : true))
+    return keywordSeries
+      .filter((series) => series.minPriceCny <= maxPrice)
+      .filter((series) => series.maxRangeKm >= minRange)
+      .filter((series) => (selectedBrands.length ? selectedBrands.includes(series.brand) : true))
       .sort((a, b) => {
-        if (sort === "range-desc") return b.rangeKm - a.rangeKm;
-        if (sort === "charge-asc") return a.fastChargeMin - b.fastChargeMin;
-        return a.priceCny - b.priceCny;
+        if (sort === "range-desc") return b.maxRangeKm - a.maxRangeKm;
+        if (sort === "charge-asc") return a.fastestChargeMin - b.fastestChargeMin;
+        return a.minPriceCny - b.minPriceCny;
       });
   }, [fuse, keyword, maxPrice, minRange, selectedBrands, sort]);
 
@@ -120,7 +118,7 @@ export function CarList() {
         <div className="mt-4 flex flex-wrap gap-2">
           {brandOptions.map((brand) => {
             const active = selectedBrands.includes(brand);
-            const car = cars.find((item) => item.brand === brand);
+            const series = carSeriesList.find((item) => item.brand === brand);
             return (
               <button
                 key={brand}
@@ -136,7 +134,7 @@ export function CarList() {
                     : "border-slate-300 bg-white hover:border-slate-400"
                 }`}
               >
-                {car ? brandLabel(car.brand, car.brandZh, language) : brand}
+                {series ? brandLabel(series.brand, series.brandZh, language) : brand}
               </button>
             );
           })}
@@ -146,61 +144,50 @@ export function CarList() {
       <section className="panel p-4 md:p-5">
         <div className="mb-4 flex items-center justify-between text-sm text-slate-600">
           <span>
-            {text.results}：{filteredCars.length} {language === "zh" ? "台" : "cars"}
+            {text.results}：{filteredSeries.length} {text.seriesUnit}
           </span>
         </div>
 
         <div className="grid gap-4 md:grid-cols-2">
-          {filteredCars.map((car) => {
-            const active = ids.includes(car.id);
+          {filteredSeries.map((series) => {
+            const cover = series.cars[0];
             return (
               <article
-                key={car.id}
+                key={series.id}
                 className="cursor-pointer overflow-hidden rounded-xl border border-slate-200 bg-white transition hover:border-slate-300"
-                onClick={() => router.push(`/cars/${car.id}`)}
+                onClick={() => router.push(`/series/${series.id}`)}
               >
                 <div className="relative h-44 w-full">
-                  <Image src={car.image} alt={car.model} fill unoptimized className="object-cover" sizes="(min-width: 768px) 50vw, 100vw" />
+                  <Image src={cover.image} alt={series.name} fill unoptimized className="object-cover" sizes="(min-width: 768px) 50vw, 100vw" />
                 </div>
                 <div className="space-y-3 p-4">
                   <div className="flex items-start justify-between gap-4">
                     <div>
-                      <p className="text-xs uppercase text-slate-500">{brandLabel(car.brand, car.brandZh, language)}</p>
-                      <h2 className="text-lg font-semibold">{car.model}</h2>
+                      <p className="text-xs uppercase text-slate-500">{brandLabel(series.brand, series.brandZh, language)}</p>
+                      <h2 className="text-lg font-semibold">{series.name}</h2>
+                      <p className="text-xs text-slate-500">
+                        {series.cars.length} {text.modelsUnit}
+                      </p>
                     </div>
                   </div>
                   <div className="grid grid-cols-3 gap-2 text-xs text-slate-600">
                     <div>
                       <p>{text.range}</p>
-                      <p className="font-semibold text-ink">{car.rangeKm} km</p>
+                      <p className="font-semibold text-ink">{series.maxRangeKm} km</p>
                     </div>
                     <div>
                       <p>{text.charge}</p>
-                      <p className="font-semibold text-ink">{car.fastChargeMin} min</p>
+                      <p className="font-semibold text-ink">{series.fastestChargeMin || "-"} {series.fastestChargeMin ? "min" : ""}</p>
                     </div>
                     <div>
-                      <p>{text.zeroToHundred}</p>
-                      <p className="font-semibold text-ink">{car.zeroToHundredSec}s</p>
+                      <p>{text.price}</p>
+                      <p className="font-semibold text-ink">
+                        {series.minPriceCny ? `${series.minPriceCny.toLocaleString()} ${language === "zh" ? "元起" : "CNY+"}` : "-"}
+                      </p>
                     </div>
                   </div>
-                  <div className="flex items-center justify-between rounded-lg border border-slate-200 bg-slate-50 p-2">
-                    <p className="text-right text-sm font-semibold text-emerald-700">
-                      {car.priceCny.toLocaleString()} {language === "zh" ? "元" : "CNY"}
-                    </p>
-                    <button
-                      type="button"
-                      onClick={(event) => {
-                        event.stopPropagation();
-                        toggleId(car.id);
-                      }}
-                      className={`rounded-lg border px-3 py-2 text-sm font-medium transition ${
-                        active
-                          ? "border-emerald-300 bg-emerald-100 text-emerald-700"
-                          : "border-slate-300 bg-white text-slate-700 hover:border-slate-400"
-                      }`}
-                    >
-                      {active ? text.added : text.addCompare}
-                    </button>
+                  <div className="rounded-lg border border-slate-200 bg-slate-50 p-2">
+                    <p className="text-center text-sm font-semibold text-ink">{text.viewSeries}</p>
                   </div>
                 </div>
               </article>

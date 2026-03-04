@@ -13,6 +13,8 @@ export type Car = {
   id: string;
   brand: string;
   brandZh: string;
+  seriesName: string;
+  trimName: string;
   model: string;
   searchAliases: string[];
   priceCny: number;
@@ -23,4 +25,16 @@ export type Car = {
   highlights: string[];
   paramsBySection: CarParamSection[];
   paramValueByName: Record<string, string>;
+};
+
+export type CarSeries = {
+  id: string;
+  name: string;
+  brand: string;
+  brandZh: string;
+  cars: Car[];
+  searchAliases: string[];
+  minPriceCny: number;
+  maxRangeKm: number;
+  fastestChargeMin: number;
 };

@@ -55,6 +55,12 @@ export function CarDetailClient({ car }: { car: Car }) {
       </section>
 
       <div className="flex gap-2">
+        <Link
+          href={`/series/${encodeURIComponent(car.seriesName)}`}
+          className="rounded-lg border border-slate-300 px-3 py-2 text-sm font-medium"
+        >
+          {text.backToSeries}
+        </Link>
         <Link href="/" className="rounded-lg border border-slate-300 px-3 py-2 text-sm font-medium">
           {text.navHome}
         </Link>

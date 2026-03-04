@@ -1,6 +1,6 @@
 import paramsRows from "@/data/dongchedi_params_table.json";
 import pureModels from "@/data/dongchedi_brand_pure_ev_models.json";
-import type { Car, CarParamSection } from "@/types/car";
+import type { Car, CarParamSection, CarSeries } from "@/types/car";
 
 type RawParamRow = {
   car_id: string;
@@ -25,8 +25,6 @@ const rawModels = pureModels as RawModel[];
 
 const SECTION_ORDER = ["基本信息", "车身", "电动机", "电池/充电", "变速箱", "底盘/转向", "车轮/制动", "智能化配置"];
 
-const PLACEHOLDER_IMAGE =
-  "https://images.unsplash.com/photo-1494976388531-d1058494cdd8?auto=format&fit=crop&w=1200&q=80";
 const OPTIONAL_PACKAGE_SECTION = "选装包";
 const NOA_FULL_SCENE_SUBSCRIPTION = "全场景领航辅助（NOA）订阅￥320/月";
 const NOA_HIGHWAY_CITY_SUBSCRIPTION = "高速城快领航辅助（NOA）订阅￥320/月";
@@ -93,10 +91,10 @@ function parseNumber(value: string): number {
 }
 
 function parseFastChargeMin(value: string): number {
-  const txt = String(value || "");
-  const hourMatch = txt.match(/快充\s*(\d+(?:\.\d+)?)\s*小时/);
+  const txt = String(value || "").trim();
+  const hourMatch = txt.match(/(?:快充\s*)?(\d+(?:\.\d+)?)\s*小时/);
   if (hourMatch) return Math.round(Number(hourMatch[1]) * 60);
-  const minMatch = txt.match(/快充\s*(\d+(?:\.\d+)?)\s*分钟?/);
+  const minMatch = txt.match(/(?:快充\s*)?(\d+(?:\.\d+)?)\s*分钟?/);
   if (minMatch) return Math.round(Number(minMatch[1]));
   return 0;
 }
@@ -149,6 +147,39 @@ function inferBrandFields(model: RawModel): { brand: string; brandZh: string } {
   if (zhPrefix) return { brand: zhPrefix, brandZh: zhPrefix };
   if (series) return { brand: series, brandZh: series };
   return { brand: "Unknown", brandZh: "Unknown" };
+}
+
+function buildDisplayModelName(seriesName: string, modelName: string): string {
+  const series = String(seriesName || "").trim();
+  const model = String(modelName || "").trim();
+  if (!series) return model;
+  if (!model) return series;
+  if (model.includes(series)) return model;
+  return `${series} ${model}`;
+}
+
+function buildSeriesId(seriesName: string): string {
+  return encodeURIComponent(seriesName);
+}
+
+function buildCommonsImageUrl(fileName: string): string {
+  return `https://commons.wikimedia.org/wiki/Special:FilePath/${encodeURIComponent(fileName)}`;
+}
+
+const SERIES_IMAGE_MAP: Record<string, string> = {
+  乐道L60: buildCommonsImageUrl("Onvo L60 010.jpg"),
+  乐道L90: buildCommonsImageUrl("Onvo L90 001.jpg"),
+  "Model 3": buildCommonsImageUrl("Tesla Model 3 (30852237538).jpg"),
+  "Model 3(进口)": buildCommonsImageUrl("Tesla model 3.jpg"),
+  "Model S": buildCommonsImageUrl("2023 Tesla Model S Plaid.jpg"),
+  "Model Y": buildCommonsImageUrl("Tesla Model Y.jpg"),
+  "Model Y L": buildCommonsImageUrl("Tesla Model Y L 003.jpg"),
+  "Model X": buildCommonsImageUrl("Tesla Model X.jpg"),
+  赛博越野旅行车: buildCommonsImageUrl("Tesla Cybertruck.jpg")
+};
+
+function pickSeriesImage(seriesName: string): string {
+  return SERIES_IMAGE_MAP[seriesName] || buildCommonsImageUrl("Tesla Model Y.jpg");
 }
 
 export const cars: Car[] = rawModels
@@ -220,21 +251,24 @@ export const cars: Car[] = rawModels
 
     const priceCny = parsePriceCny(pickValue(valueMap, ["官方指导价"]));
     const rangeKm = parseNumber(pickValue(valueMap, ["纯电续航里程(km)CLTC", "纯电续航里程(km)工信部"]));
-    const fastChargeMin = parseFastChargeMin(pickValue(valueMap, ["充电时间"]));
+    const fastChargeMin = parseFastChargeMin(pickValue(valueMap, ["充电时间", "充电时间(小时)", "快充时间"]));
     const zeroToHundredSec = parseNumber(pickValue(valueMap, ["官方百公里加速时间(s)"]));
     const { brand, brandZh } = inferBrandFields(model);
+    const displayModel = buildDisplayModelName(model.series_name, model.model_name);
 
     return {
       id: `car-${carId}`,
       brand,
       brandZh,
-      model: model.model_name,
+      seriesName: model.series_name,
+      trimName: model.model_name,
+      model: displayModel,
       searchAliases: [brandZh, brand, model.series_name, model.model_name, carId],
       priceCny,
       rangeKm,
       zeroToHundredSec,
       fastChargeMin,
-      image: PLACEHOLDER_IMAGE,
+      image: pickSeriesImage(model.series_name),
       highlights: buildHighlights(valueMap),
       paramsBySection,
       paramValueByName: valueMap
@@ -244,3 +278,39 @@ export const cars: Car[] = rawModels
 
 export const carMap = new Map(cars.map((car) => [car.id, car]));
 export const brandOptions = Array.from(new Set(cars.map((car) => car.brand)));
+
+export const carSeriesList: CarSeries[] = Array.from(
+  cars.reduce((acc, car) => {
+    const key = car.seriesName;
+    const found = acc.get(key);
+    if (found) {
+      found.cars.push(car);
+      found.searchAliases = Array.from(new Set([...found.searchAliases, ...car.searchAliases]));
+      return acc;
+    }
+    acc.set(key, {
+      id: buildSeriesId(key),
+      name: key,
+      brand: car.brand,
+      brandZh: car.brandZh,
+      cars: [car],
+      searchAliases: [key, car.brand, car.brandZh, ...car.searchAliases],
+      minPriceCny: 0,
+      maxRangeKm: 0,
+      fastestChargeMin: 0
+    });
+    return acc;
+  }, new Map<string, CarSeries>())
+    .values()
+).map((series) => {
+  const prices = series.cars.map((car) => car.priceCny).filter((value) => value > 0);
+  const charges = series.cars.map((car) => car.fastChargeMin).filter((value) => value > 0);
+  return {
+    ...series,
+    minPriceCny: prices.length ? Math.min(...prices) : 0,
+    maxRangeKm: Math.max(...series.cars.map((car) => car.rangeKm), 0),
+    fastestChargeMin: charges.length ? Math.min(...charges) : 0
+  };
+});
+
+export const carSeriesMap = new Map(carSeriesList.map((series) => [series.name, series]));
