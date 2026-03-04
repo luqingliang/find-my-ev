@@ -3,6 +3,7 @@
 import Fuse from "fuse.js";
 import { useMemo, useState, type CSSProperties } from "react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 import { cars, brandOptions } from "@/data/cars";
 import { brandLabel, t } from "@/lib/i18n";
 import { useCompareStore } from "@/lib/useCompareStore";
@@ -158,7 +159,9 @@ export function CarList() {
                 className="cursor-pointer overflow-hidden rounded-xl border border-slate-200 bg-white transition hover:border-slate-300"
                 onClick={() => router.push(`/cars/${car.id}`)}
               >
-                <img src={car.image} alt={car.model} className="h-44 w-full object-cover" />
+                <div className="relative h-44 w-full">
+                  <Image src={car.image} alt={car.model} fill unoptimized className="object-cover" sizes="(min-width: 768px) 50vw, 100vw" />
+                </div>
                 <div className="space-y-3 p-4">
                   <div className="flex items-start justify-between gap-4">
                     <div>

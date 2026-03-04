@@ -3,8 +3,7 @@ import "./globals.css";
 import { LanguageSync } from "@/components/language-sync";
 import { SiteHeader } from "@/components/site-header";
 import { CompareFab } from "@/components/compare-fab";
-
-export const dynamic = "force-dynamic";
+import { CompareSync } from "@/components/compare-sync";
 
 export const metadata: Metadata = {
   title: "找到我的车",
@@ -16,6 +15,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="zh-CN">
       <body>
         <LanguageSync />
+        <CompareSync />
         <SiteHeader />
         <CompareFab />
         <main className="mx-auto max-w-6xl px-4 py-6">{children}</main>
